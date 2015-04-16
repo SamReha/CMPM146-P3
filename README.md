@@ -6,6 +6,5 @@ This project is a solution to a homework assignment from CMPM 146: Game AI with 
 
 #Team Members
 
-Samuel Reha (sreha@ucsc.edu)
-
-Patrick Russel (pcrussel@ucsc.edu)
+*Samuel Reha (sreha@ucsc.edu)
+*Patrick Russel (pcrussel@ucsc.edu)
