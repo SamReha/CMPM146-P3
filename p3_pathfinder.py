@@ -5,7 +5,7 @@ def find_path(source_point, destination_point, mesh):
     def dijk(src, dst, graph):
         dist = {}
         prev = {}
-        q = []
+        q = []      # Note, treat q as a priority queue
 
         dist[src] = 0
         prev[src] = None
@@ -20,8 +20,8 @@ def find_path(source_point, destination_point, mesh):
             neighborhood = graph['adj'][u]
 
             for neighbor in neighborhood:
-                #alt = dist[u] + coordinate_distance(u, neighbor)
-                if neighbor not in dist:# or alt < dist[neighbor]:
+                alt = 0#dist[u] + coordinate_distance(u, neighbor) Setting alt to 0 makes this behave like BFS
+                if neighbor not in dist or alt < dist[neighbor]:
                     dist[neighbor] = alt
                     prev[neighbor] = u
                     heappush(q, (alt, neighbor))
@@ -51,21 +51,25 @@ def find_path(source_point, destination_point, mesh):
     path=[]
     path_list = []
     visited_nodes=[]
+    source_box = None
+    destination_box = None
     found_source = False
     found_dest = False
     
     # Find source and destination points within mesh:
     for box in mesh['boxes']:
         if is_in_box(source_point, box) and not found_source:
+            source_box = box
             path_list.append(source_point)
             visited_nodes.append(box)
         if is_in_box(destination_point, box) and not found_dest:
+            destination_box = box
             path_list.append(destination_point)
             visited_nodes.append(box)
         if found_source and found_dest:
             break
             
-    path_list = dijk(source_point, destination_point, mesh)
+    path_list = dijk(source_box, destination_box, mesh)
         
     path.append(path_list)
     return (path, visited_nodes)
