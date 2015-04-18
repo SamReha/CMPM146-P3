@@ -3,12 +3,13 @@ from math import sqrt
 
 def find_path(source_point, destination_point, mesh):
     # Dijkstra's currently acting as BFS
-    def dijk(src, dst, graph):
+    def A_star(src, dst, graph):
         dist = {}
         prev = {}
         detail_points = {}
         q = []      # Note, treat q as a priority queue
         detail_points[src] = source_point
+        detail_points[dst] = destination_point
         dist[src] = 0
         prev[src] = None
         heappush(q, (dist[src], src))
@@ -34,12 +35,12 @@ def find_path(source_point, destination_point, mesh):
                 detail_points[neighbor] = neighbor_coord
                 
                 alt = dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
-                visited_nodes.append(neighbor)
                 
                 if neighbor not in dist or alt < dist[neighbor]:
-                    dist[neighbor] = alt
+                    visited_nodes.append(neighbor)
+                    dist[neighbor] = alt# 
                     prev[neighbor] = u
-                    heappush(q, (alt, neighbor))
+                    heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
 
         if u == dst:
             path = []
@@ -98,7 +99,7 @@ def find_path(source_point, destination_point, mesh):
         path_list = [source_point, destination_point]
         visited_nodes=[source_box]
     else:
-        path_list = dijk(source_box, destination_box, mesh)
+        path_list = A_star(source_box, destination_box, mesh)
         
     if len(path_list) is 0:
         print "No path could be found!"
