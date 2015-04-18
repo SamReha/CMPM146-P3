@@ -1,4 +1,41 @@
+from heapq import heappush, heappop
+
 def find_path(source_point, destination_point, mesh):
+    # Dijkstra's currently acting as BFS
+    def dijk(src, dst, graph):
+        dist = {}
+        prev = {}
+        q = []
+
+        dist[src] = 0
+        prev[src] = None
+        heappush(q, (dist[src], src))
+
+        while len(q) > 0:
+            _, u = heappop(q)
+
+            if u == dst:
+                break
+
+            neighborhood = graph['adj'][u]
+
+            for neighbor in neighborhood:
+                #alt = dist[u] + coordinate_distance(u, neighbor)
+                if neighbor not in dist:# or alt < dist[neighbor]:
+                    dist[neighbor] = alt
+                    prev[neighbor] = u
+                    heappush(q, (alt, neighbor))
+
+        if u == dst:
+            path = []
+            while u:
+                path.append(u)
+                u = prev[u]
+            # path.reverse() Uncomment this if we ever want to print the path out for the user
+            return path
+        else:
+            return []
+            
     def is_in_box(point, box):
         x = point[0]
         y = point[1]
@@ -27,6 +64,8 @@ def find_path(source_point, destination_point, mesh):
             visited_nodes.append(box)
         if found_source and found_dest:
             break
+            
+    path_list = dijk(source_point, destination_point, mesh)
         
     path.append(path_list)
     return (path, visited_nodes)
