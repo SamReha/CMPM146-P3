@@ -1,3 +1,6 @@
+# By  Sam Reha   and Patrick Russell
+# sreha@ucsc.ucsc - pcrussel@ucsc.edu
+
 from heapq import heappush, heappop
 from math import sqrt
 
@@ -12,14 +15,17 @@ def find_path(source_point, destination_point, mesh):
         detail_points[dst] = destination_point
         dist[src] = 0
         prev[src] = None
+        #Push the queue, the distance to the source, and the source into a heap
         heappush(q, (dist[src], src))
-
+        
+        #while the priority queue still has nodes
         while len(q) > 0:
+            #Pop from the queue
             _, u = heappop(q)
-
+            #Break if the destination is reached
             if u == dst:
                 break
-
+            #Get the neighbours of the current node
             neighborhood = graph['adj'].get(u, [])
 
             for neighbor in neighborhood:
@@ -30,7 +36,7 @@ def find_path(source_point, destination_point, mesh):
                 neighbor_x2 = neighbor[1]
                 neighbor_y1 = neighbor[2]
                 neighbor_y2 = neighbor[3]
-                
+                #Get the direction of the newest neighbour
                 neighbor_coord = (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
                 detail_points[neighbor] = neighbor_coord
                 
@@ -41,7 +47,7 @@ def find_path(source_point, destination_point, mesh):
                     dist[neighbor] = alt# 
                     prev[neighbor] = u
                     heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
-
+        #Draw the line between points
         if u == dst:
             path = []
             detail_points[src] = source_point
@@ -55,7 +61,7 @@ def find_path(source_point, destination_point, mesh):
             return path
         else:
             return []
-            
+    #Gets the distance between  two coordinates
     def coordinate_distance(coord1, coord2):
         x1 = coord1[0]
         x2 = coord2[0]
@@ -64,7 +70,7 @@ def find_path(source_point, destination_point, mesh):
         y2 = coord2[1]
 
         return sqrt((x1-x2)**2+(y1-y2)**2)
-            
+    #Gets the box the the point is in   
     def is_in_box(point, box):
         x = point[0]
         y = point[1]
