@@ -36,8 +36,8 @@ def find_path(source_point, destination_point, mesh):
                 neighbor_x2 = neighbor[1]
                 neighbor_y1 = neighbor[2]
                 neighbor_y2 = neighbor[3]
-                #Get the direction of the newest neighbour
-                neighbor_coord = (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
+                #Get the direction of the newest neighbour 
+                neighbor_coord = (min(neighbor_x2,max(neighbor_x1,u_x)), min(neighbor_y2,max(neighbor_y1,u_y)))
                 detail_points[neighbor] = neighbor_coord
                 
                 alt = dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
