@@ -7,24 +7,45 @@ from math import sqrt
 def find_path(source_point, destination_point, mesh):
     # A_star acting as Dijkstra's.
     def A_star(src_box, dst_box, graph):
-        dist = {}
-        prev = {}
+        #dist = {}
+        #prev = {}        
+        forward_visit = {}
+        backward_visit = {}
+        
+        forward_dist = {}
+        backward_dist = {}
+        
+        forward_prev = {}
+        backward_prev = {}
+        
         detail_points = {}
         q = []      # Note, treat q as a priority queue
+        
         detail_points[src_box] = source_point
         detail_points[dst_box] = destination_point
-        dist[src_box] = 0
-        prev[src_box] = None
+        forward_dist[src_box] = 0
+        forward_prev[src_box] = None
+        
+        backward_dist[dst_box] = 0
+        backward_prev[dst_box] = None
         #Push the queue, the distance to the source, and the source into a heap
-        heappush(q, (dist[src_box], src_box))
+        heappush(q, (forward_dist[src_box], src_box, "Destination"))
+        heappush(q, (backward_dist[dst_box], dst_box, "Source"))
         
         #while the priority queue still has nodes
         while len(q) > 0:
             #Pop from the queue
-            _, u = heappop(q)
+            qElem = heappop(q)
+            u = qElem[1]
+            goal = qElem[2]
             #Break if the destination is reached
-            if u == dst_box:
-                break
+            """if u == dst_box:
+                break"""
+            if goal == "Destination" and u in backward_visit:
+               break
+            elif goal == "Source" and u in forward_visit:
+               break
+               
             #Get the neighbours of the current node
             neighborhood = graph['adj'].get(u, [])
 
@@ -32,27 +53,51 @@ def find_path(source_point, destination_point, mesh):
                 u_coord = detail_points[u]
                 detail_points[neighbor] = get_detail_point(u_coord, neighbor)
                 
-                alt = dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
-                
-                if neighbor not in dist or alt < dist[neighbor]:
-                    visited_nodes.append(neighbor)
-                    dist[neighbor] = alt
-                    prev[neighbor] = u
-                    #heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
-                    heappush(q, (alt, neighbor))
+                if goal == "Destination":
+                   alt = forward_dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
+                   
+                   if neighbor not in forward_dist or alt < forward_dist[neighbor]:
+                       visited_nodes.append(neighbor)
+                       forward_dist[neighbor] = alt
+                       forward_prev[neighbor] = u
+                       #heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
+                       heappush(q, (alt, neighbor))
+                else:
+                   alt = backward_dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
+                   
+                   if neighbor not in backward_dist or alt < backward_dist[neighbor]:
+                       visited_nodes.append(neighbor)
+                       backward_dist[neighbor] = alt
+                       backward_prev[neighbor] = u
+                       #heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
+                       heappush(q, (alt, neighbor))
+                       
         #Draw the line between points
-        if u == dst_box:
+        if u in forward_visit and u in backward_visit:
+            backward_u = u
+            forward_u = u
+            
             path = []
             detail_points[src_box] = source_point
             detail_points[dst_box] = destination_point
-            while u:
-                prev_u = prev[u]
+            while forward_u:
+                prev_u = forward_prev[u]
                 if prev_u is not None:
-                    detail_points[prev_u] = get_detail_point(detail_points[u], prev_u)
-                    path.append((detail_points[u], detail_points[prev_u]))
+                    detail_points[prev_u] = get_detail_point(detail_points[forward_u], prev_u)
+                    path.append((detail_points[forward_u], detail_points[prev_u]))
                 else:
-                    path.append((detail_points[u], source_point))
-                u = prev_u
+                    path.append((detail_points[forward_u], source_point))
+                forward_u = prev_u
+                
+            while backward_u:
+                prev_u = backward_prev[u]
+                if prev_u is not None:
+                    detail_points[prev_u] = get_detail_point(detail_points[backward_u], prev_u)
+                    path.append((detail_points[backward_u], detail_points[prev_u]))
+                else:
+                    path.append((detail_points[backward_u], destination_point))
+                backward_u = prev_u
+                
             # path.reverse() Uncomment this if we ever want to print the path out for the user
             return path
         else:
