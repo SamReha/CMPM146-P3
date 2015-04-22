@@ -5,7 +5,6 @@ from heapq import heappush, heappop
 from math import sqrt
 
 def find_path(source_point, destination_point, mesh):
-    # Dijkstra's currently acting as BFS
     def A_star(src, dst, graph):
         dist = {}
         prev = {}
@@ -30,15 +29,7 @@ def find_path(source_point, destination_point, mesh):
 
             for neighbor in neighborhood:
                 u_coord = detail_points[u]
-                u_x = u_coord[0]
-                u_y = u_coord[1]
-                neighbor_x1 = neighbor[0]
-                neighbor_x2 = neighbor[1]
-                neighbor_y1 = neighbor[2]
-                neighbor_y2 = neighbor[3]
-                #Get the direction of the newest neighbour
-                neighbor_coord = (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
-                detail_points[neighbor] = neighbor_coord
+                detail_points[neighbor] = get_detail_point(u_coord, neighbor)
                 
                 alt = dist[u] + coordinate_distance(detail_points[u], detail_points[neighbor]) # Setting alt to 0 makes this behave like BFS
                 
@@ -55,12 +46,26 @@ def find_path(source_point, destination_point, mesh):
             while u:
                 prev_u = prev[u]
                 if prev_u is not None:
+                    detail_points[prev_u] = get_detail_point(detail_points[u], prev_u)
                     path.append((detail_points[u], detail_points[prev_u]))
                 u = prev_u
             # path.reverse() Uncomment this if we ever want to print the path out for the user
             return path
         else:
             return []
+            
+    # Gets the detail point of a box
+    def get_detail_point(starting_point, new_box):
+        u_x = starting_point[0]
+        u_y = starting_point[1]
+        neighbor_x1 = new_box[0]
+        neighbor_x2 = new_box[1]
+        neighbor_y1 = new_box[2]
+        neighbor_y2 = new_box[3]
+        
+        # return (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
+        return (min(neighbor_x2,max(neighbor_x1,u_x)), min(neighbor_y2,max(neighbor_y1,u_y)))
+            
     #Gets the distance between  two coordinates
     def coordinate_distance(coord1, coord2):
         x1 = coord1[0]
