@@ -6,24 +6,24 @@ from math import sqrt
 
 def find_path(source_point, destination_point, mesh):
     # A_star acting as Dijkstra's.
-    def A_star(src, dst, graph):
+    def A_star(src_box, dst_box, graph):
         dist = {}
         prev = {}
         detail_points = {}
         q = []      # Note, treat q as a priority queue
-        detail_points[src] = source_point
-        detail_points[dst] = destination_point
-        dist[src] = 0
-        prev[src] = None
+        detail_points[src_box] = source_point
+        detail_points[dst_box] = destination_point
+        dist[src_box] = 0
+        prev[src_box] = None
         #Push the queue, the distance to the source, and the source into a heap
-        heappush(q, (dist[src], src))
+        heappush(q, (dist[src_box], src_box))
         
         #while the priority queue still has nodes
         while len(q) > 0:
             #Pop from the queue
             _, u = heappop(q)
             #Break if the destination is reached
-            if u == dst:
+            if u == dst_box:
                 break
             #Get the neighbours of the current node
             neighborhood = graph['adj'].get(u, [])
@@ -41,10 +41,10 @@ def find_path(source_point, destination_point, mesh):
                     #heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
                     heappush(q, (alt, neighbor))
         #Draw the line between points
-        if u == dst:
+        if u == dst_box:
             path = []
-            detail_points[src] = source_point
-            detail_points[dst] = destination_point
+            detail_points[src_box] = source_point
+            detail_points[dst_box] = destination_point
             while u:
                 prev_u = prev[u]
                 if prev_u is not None:
