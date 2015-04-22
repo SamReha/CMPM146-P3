@@ -5,6 +5,7 @@ from heapq import heappush, heappop
 from math import sqrt
 
 def find_path(source_point, destination_point, mesh):
+    # A_star acting as Dijkstra's.
     def A_star(src, dst, graph):
         dist = {}
         prev = {}
@@ -35,9 +36,10 @@ def find_path(source_point, destination_point, mesh):
                 
                 if neighbor not in dist or alt < dist[neighbor]:
                     visited_nodes.append(neighbor)
-                    dist[neighbor] = alt# 
+                    dist[neighbor] = alt
                     prev[neighbor] = u
-                    heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
+                    #heappush(q, (alt + coordinate_distance(detail_points[neighbor], destination_point), neighbor))
+                    heappush(q, (alt, neighbor))
         #Draw the line between points
         if u == dst:
             path = []
@@ -48,6 +50,8 @@ def find_path(source_point, destination_point, mesh):
                 if prev_u is not None:
                     detail_points[prev_u] = get_detail_point(detail_points[u], prev_u)
                     path.append((detail_points[u], detail_points[prev_u]))
+                else:
+                    path.append((detail_points[u], source_point))
                 u = prev_u
             # path.reverse() Uncomment this if we ever want to print the path out for the user
             return path
@@ -56,15 +60,14 @@ def find_path(source_point, destination_point, mesh):
             
     # Gets the detail point of a box
     def get_detail_point(starting_point, new_box):
-        u_x = starting_point[0]
-        u_y = starting_point[1]
+        u_x, u_y = starting_point
         neighbor_x1 = new_box[0]
         neighbor_x2 = new_box[1]
         neighbor_y1 = new_box[2]
         neighbor_y2 = new_box[3]
         
-        # return (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
-        return (min(neighbor_x2,max(neighbor_x1,u_x)), min(neighbor_y2,max(neighbor_y1,u_y)))
+        return (min(neighbor_x2-1,max(neighbor_x1,u_x)), min(neighbor_y2-1,max(neighbor_y1,u_y)))
+        #return (min(neighbor_x2,max(neighbor_x1,u_x)), min(neighbor_y2,max(neighbor_y1,u_y)))
             
     #Gets the distance between  two coordinates
     def coordinate_distance(coord1, coord2):
@@ -107,7 +110,7 @@ def find_path(source_point, destination_point, mesh):
             break
     
     if source_box == destination_box:
-        path_list = [source_point, destination_point]
+        path_list = [(source_point, destination_point)]
         visited_nodes=[source_box]
     else:
         path_list = A_star(source_box, destination_box, mesh)
